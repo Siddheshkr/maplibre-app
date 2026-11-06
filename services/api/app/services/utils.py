@@ -17,7 +17,11 @@ def validate_layer_id(layer_id: str) -> tuple[str, str]:
 
 
 def humanize_identifier(value: str) -> str:
-    cleaned = value.replace("_", " ").strip()
+    # Layer tables are often prefixed with an ordering code (l01_) or an
+    # "extra" marker (x_). Keep the table id intact but display a clean title.
+    cleaned = re.sub(r"^l\d{1,3}_", "", value, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^x_", "", cleaned, flags=re.IGNORECASE)
+    cleaned = cleaned.replace("_", " ").strip()
     if not cleaned:
         return value
     return cleaned[0].upper() + cleaned[1:]

@@ -71,6 +71,8 @@ def test_normalize_geometry_type(raw: str | None, expected: str) -> None:
 
 def test_humanize_identifier() -> None:
     assert humanize_identifier("land_parcels") == "Land parcels"
+    assert humanize_identifier("l03_building_footprints") == "Building footprints"
+    assert humanize_identifier("x_agricultural_land") == "Agricultural land"
 
 
 @pytest.mark.parametrize(

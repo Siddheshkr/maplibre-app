@@ -21,7 +21,10 @@ import type {
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { LayerDefinition } from '../../core/models/layer.model';
+import {
+  LayerDefinition,
+  LayerExtent,
+} from '../../core/models/layer.model';
 import { LayerCatalogService } from '../../core/services/layer-catalog.service';
 
 interface ManagedLayer {
@@ -54,6 +57,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
   private readonly managed = new Map<string, ManagedLayer>();
   private readonly renderToLayer = new Map<string, LayerDefinition>();
+  private hasAutoFitted = false;
 
   constructor() {
     effect(() => {
@@ -237,6 +241,58 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         this.renderToLayer.set(renderId, layer);
       }
     }
+
+    void this.fitInitialExtent(ordered, visibility);
+  }
+
+  private async fitInitialExtent(
+    layers: readonly LayerDefinition[],
+    visibility: Record<string, boolean>,
+  ): Promise<void> {
+    if (this.hasAutoFitted) {
+      return;
+    }
+
+    const candidates = layers
+      .filter((layer) => visibility[layer.id] !== false)
+      .slice(0, 3);
+    if (!candidates.length || !this.map) {
+      return;
+    }
+    this.hasAutoFitted = true;
+
+    const results = await Promise.allSettled(
+      candidates.map((layer) =>
+        firstValueFrom(this.catalog.getExtent(layer.id)),
+      ),
+    );
+    const extents = results
+      .filter(
+        (result): result is PromiseFulfilledResult<LayerExtent> =>
+          result.status === 'fulfilled',
+      )
+      .map((result) => result.value);
+
+    if (!extents.length || !this.map) {
+      return;
+    }
+
+    const bounds: [[number, number], [number, number]] = [
+      [
+        Math.min(...extents.map((extent) => extent.minX)),
+        Math.min(...extents.map((extent) => extent.minY)),
+      ],
+      [
+        Math.max(...extents.map((extent) => extent.maxX)),
+        Math.max(...extents.map((extent) => extent.maxY)),
+      ],
+    ];
+
+    this.map.fitBounds(bounds, {
+      padding: 48,
+      duration: 0,
+      maxZoom: 14,
+    });
   }
 
   private renderPriority(layer: LayerDefinition): number {
