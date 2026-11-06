@@ -1,0 +1,25 @@
+# Angular
+node_modules/
+dist/
+.angular/
+out-tsc/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Environment files (keep the examples)
+.env
+.env.*
+!.env.example
+
+# Local database volume
+pgdata/
+
+# Logs and OS files
+*.log
+.DS_Store
+nohup.out

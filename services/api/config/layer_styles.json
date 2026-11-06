@@ -1,0 +1,60 @@
+{
+  "layers": {
+    "gis.districts": {
+      "title": "Districts",
+      "visible": true,
+      "minZoom": 4,
+      "maxZoom": 16,
+      "columns": ["id", "name", "state"],
+      "style": {
+        "fillColor": "#2563eb",
+        "fillOpacity": 0.28,
+        "lineColor": "#1d4ed8",
+        "lineWidth": 1.4
+      }
+    },
+    "gis.roads": {
+      "title": "Road network",
+      "visible": true,
+      "minZoom": 8,
+      "maxZoom": 22,
+      "columns": ["id", "name", "road_class"],
+      "style": {
+        "lineColor": "#d97706",
+        "lineWidth": 2.4
+      }
+    },
+    "gis.facilities": {
+      "title": "Facilities",
+      "visible": true,
+      "columns": ["id", "name", "category"],
+      "style": {
+        "circleColor": "#dc2626",
+        "circleRadius": 6,
+        "circleStrokeColor": "#ffffff",
+        "circleStrokeWidth": 1.5
+      }
+    },
+    "gis.parcels": {
+      "title": "Land parcels",
+      "visible": false,
+      "minZoom": 12,
+      "maxZoom": 22,
+      "columns": ["id", "parcel_no", "status", "area_ha"],
+      "style": {
+        "fillColor": [
+          "match",
+          ["get", "status"],
+          "vacant",
+          "#f59e0b",
+          "allotted",
+          "#16a34a",
+          "#64748b"
+        ],
+        "fillOpacity": 0.42,
+        "lineColor": "#475569",
+        "lineWidth": 0.8
+      }
+    }
+  }
+}

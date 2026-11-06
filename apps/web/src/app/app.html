@@ -1,0 +1,130 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 7.5 12 4l8 3.5-8 3.5-8-3.5Z" />
+          <path d="m4 12 8 3.5 8-3.5" />
+          <path d="m4 16.5 8 3.5 8-3.5" />
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <h1>Spatial Explorer</h1>
+        <p>PostGIS vectors · MapLibre</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <span class="status-chip" [class]="'status-chip status-chip--' + statusTone()">
+        <span class="status-dot"></span>
+        {{ statusLabel() }}
+      </span>
+
+      <button
+        type="button"
+        class="panel-toggle"
+        [attr.aria-expanded]="panelOpen()"
+        (click)="togglePanel()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7.5 12 4l8 3.5-8 3.5-8-3.5Z" />
+          <path d="m4 12 8 3.5 8-3.5" />
+          <path d="m4 16.5 8 3.5 8-3.5" />
+        </svg>
+        <span>Layers</span>
+        <span class="panel-count">{{ activeCount() }}/{{ layers().length }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-body">
+    <app-layer-panel
+      [open]="panelOpen()"
+      [layers]="layers()"
+      [visibility]="visibility()"
+      [opacity]="opacity()"
+      [status]="status()"
+      [error]="error()"
+      (toggleLayer)="setVisibility($event.id, $event.visible)"
+      (opacityChange)="setOpacity($event.id, $event.value)"
+      (zoomTo)="zoomTo($event)"
+      (showAll)="showAll()"
+      (hideAll)="hideAll()"
+      (retry)="retry()"
+      (close)="panelOpen.set(false)"
+    />
+
+    <section class="map-wrap">
+      <app-map-view
+        #mapView
+        [layers]="layers()"
+        [visibility]="visibility()"
+        [opacity]="opacity()"
+      />
+
+      @if (status() === 'loading' || status() === 'idle') {
+        <div class="map-overlay">
+          <div class="overlay-card">
+            <span class="spinner" aria-hidden="true"></span>
+            <div>
+              <h2>Reading spatial tables</h2>
+              <p>Discovering PostGIS layers and preparing the map.</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (status() === 'unconfigured' || status() === 'error') {
+        <div class="map-overlay">
+          <div class="overlay-card overlay-card--error">
+            <div class="overlay-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 8v5M12 17h.01" />
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+            </div>
+            <div class="overlay-copy">
+              <h2>
+                {{ status() === 'unconfigured' ? 'No spatial database yet' : 'Could not reach the spatial API' }}
+              </h2>
+              <p>{{ error() }}</p>
+              @if (status() === 'unconfigured') {
+                <p class="overlay-hint">
+                  Add the database connection to
+                  <code>services/api/.env</code>, then restart the API.
+                </p>
+              }
+              <button type="button" class="overlay-button" (click)="retry()">
+                Retry connection
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (status() === 'ready' && layers().length === 0) {
+        <div class="map-overlay">
+          <div class="overlay-card">
+            <div class="overlay-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 7.5 12 4l8 3.5-8 3.5-8-3.5Z" />
+                <path d="m4 12 8 3.5 8-3.5" />
+                <path d="m4 16.5 8 3.5 8-3.5" />
+              </svg>
+            </div>
+            <div class="overlay-copy">
+              <h2>No spatial layers found</h2>
+              <p>
+                The API is connected, but no PostGIS geometry tables were found
+                in the configured schemas.
+              </p>
+              <button type="button" class="overlay-button" (click)="retry()">
+                Refresh catalogue
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  </main>
+</div>

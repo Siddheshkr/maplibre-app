@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: maplibre-app-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gisdb
+      POSTGRES_USER: gis_admin
+      POSTGRES_PASSWORD: gis_admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/seed:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gis_admin -d gisdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  pgdata:

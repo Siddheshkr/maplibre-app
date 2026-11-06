@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  background: #dbe4ee;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  z-index: 6;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border: 1px solid #f5d7a1;
+  border-radius: 10px;
+  background: #fffbeb;
+  color: #92400e;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+  font-size: 12.5px;
+  font-weight: 600;
+  max-width: calc(100% - 40px);
+}
+
+:host ::ng-deep .maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
