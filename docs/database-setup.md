@@ -169,7 +169,7 @@ Colours accept MapLibre expressions:
 
 Defaults:
 
-- `visible`: the first `DEFAULT_VISIBLE_LAYERS` layers (default 3) are visible.
+- `visible`: every discovered layer is visible by default. Set `DEFAULT_VISIBLE_LAYERS` to limit the initial set, or set `visible` per layer.
 - `minZoom` / `maxZoom`: 0 / 22.
 - `title`: humanised table name.
 - Style: colour from the layer palette, based on geometry type.

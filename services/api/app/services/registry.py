@@ -153,7 +153,8 @@ class SpatialRegistry:
 
             visible = config.get("visible")
             if not isinstance(visible, bool):
-                visible = index < self._settings.default_visible_layers
+                limit = self._settings.default_visible_layers
+                visible = True if limit is None else index < limit
 
             min_zoom = self._int_setting(config.get("minZoom"), 0, 0, 22)
             max_zoom = self._int_setting(config.get("maxZoom"), 22, min_zoom, 24)

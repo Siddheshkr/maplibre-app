@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     default_feature_limit: int = Field(default=500, ge=1, le=50_000)
     max_columns: int = Field(default=40, ge=1, le=100)
     layer_cache_ttl_seconds: int = Field(default=60, ge=0, le=3600)
-    default_visible_layers: int = Field(default=3, ge=0, le=100)
+    default_visible_layers: int | None = Field(default=None, ge=0, le=1000)
     style_config_path: str = "config/layer_styles.json"
 
     @property
