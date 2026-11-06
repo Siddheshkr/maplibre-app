@@ -57,3 +57,20 @@ export interface FeatureSelection {
   layer: LayerDefinition;
   properties: Record<string, unknown>;
 }
+
+export interface GeoJsonGeometry {
+  type: string;
+  coordinates: any;
+}
+
+export interface GeoJsonFeature {
+  type: 'Feature';
+  id?: string | number;
+  geometry: GeoJsonGeometry;
+  properties: Record<string, unknown>;
+}
+
+export interface FeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJsonFeature[];
+}

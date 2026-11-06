@@ -48,6 +48,7 @@
       (toggleLayer)="setVisibility($event.id, $event.visible)"
       (opacityChange)="setOpacity($event.id, $event.value)"
       (zoomTo)="zoomTo($event)"
+      (selectFeature)="flyToFeature($event)"
       (showAll)="showAll()"
       (hideAll)="hideAll()"
       (retry)="retry()"

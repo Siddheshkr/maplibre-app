@@ -1,6 +1,6 @@
 import { Component, computed, inject, linkedSignal, signal, viewChild } from '@angular/core';
 
-import { LayerDefinition } from './core/models/layer.model';
+import { GeoJsonFeature, LayerDefinition } from './core/models/layer.model';
 import { LayerCatalogService } from './core/services/layer-catalog.service';
 import { LayerPanelComponent } from './map/layer-panel/layer-panel.component';
 import { MapViewComponent } from './map/map-view/map-view.component';
@@ -116,6 +116,11 @@ export class App {
 
   zoomTo(layer: LayerDefinition): void {
     void this.mapView()?.zoomToLayer(layer);
+  }
+
+  flyToFeature(event: { feature: GeoJsonFeature; layer: LayerDefinition }): void {
+    this.setVisibility(event.layer.id, true);
+    this.mapView()?.flyToFeature(event.feature, event.layer);
   }
 
   retry(): void {

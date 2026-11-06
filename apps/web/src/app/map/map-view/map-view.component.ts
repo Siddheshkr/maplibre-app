@@ -22,6 +22,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  GeoJsonFeature,
+  GeoJsonGeometry,
   LayerDefinition,
   LayerExtent,
 } from '../../core/models/layer.model';
@@ -174,6 +176,99 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     } catch {
       this.showNotice('Could not determine the extent for this layer.');
     }
+  }
+
+  flyToFeature(feature: GeoJsonFeature, layer?: LayerDefinition): void {
+    const map = this.map;
+    if (!map || !feature.geometry) {
+      return;
+    }
+
+    const result = this.getGeometryCenterAndBounds(feature.geometry);
+    if (!result) {
+      this.showNotice('Feature has no valid coordinates.');
+      return;
+    }
+
+    const { center, bounds } = result;
+
+    if (bounds) {
+      map.fitBounds(bounds, {
+        padding: 100,
+        maxZoom: 18,
+        duration: 1100,
+      });
+    } else {
+      map.flyTo({
+        center,
+        zoom: Math.max(map.getZoom(), 16),
+        duration: 1100,
+      });
+    }
+
+    // Display popup at the feature's location
+    this.popup?.remove();
+    if (layer) {
+      this.popup = new maplibregl.Popup({
+        maxWidth: '360px',
+        closeButton: true,
+        offset: 12,
+      })
+        .setLngLat(center)
+        .setHTML(this.popupHtml(layer, feature.properties ?? {}))
+        .addTo(map);
+    }
+  }
+
+  private getGeometryCenterAndBounds(geometry: GeoJsonGeometry): {
+    center: [number, number];
+    bounds?: [[number, number], [number, number]];
+  } | null {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    const traverse = (coords: any): void => {
+      if (!Array.isArray(coords) || coords.length === 0) {
+        return;
+      }
+      if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+        const lng = coords[0];
+        const lat = coords[1];
+        if (lng < minX) minX = lng;
+        if (lat < minY) minY = lat;
+        if (lng > maxX) maxX = lng;
+        if (lat > maxY) maxY = lat;
+        return;
+      }
+      for (const item of coords) {
+        traverse(item);
+      }
+    };
+
+    if (!geometry.coordinates) {
+      return null;
+    }
+    traverse(geometry.coordinates);
+
+    if (minX === Infinity || minY === Infinity) {
+      return null;
+    }
+
+    const center: [number, number] = [(minX + maxX) / 2, (minY + maxY) / 2];
+
+    if (geometry.type === 'Point' || (minX === maxX && minY === maxY)) {
+      return { center };
+    }
+
+    return {
+      center,
+      bounds: [
+        [minX, minY],
+        [maxX, maxY],
+      ],
+    };
   }
 
   private baseStyle(): StyleSpecification | string {

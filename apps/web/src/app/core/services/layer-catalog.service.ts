@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CatalogStatus,
+  FeatureCollection,
   LayerDefinition,
   LayerExtent,
   LayersResponse,
@@ -52,6 +53,12 @@ export class LayerCatalogService {
   getExtent(layerId: string): Observable<LayerExtent> {
     return this.http.get<LayerExtent>(
       `${environment.apiBaseUrl}/layers/${encodeURIComponent(layerId)}/extent`,
+    );
+  }
+
+  getFeatures(layerId: string, limit = 500): Observable<FeatureCollection> {
+    return this.http.get<FeatureCollection>(
+      `${environment.apiBaseUrl}/layers/${encodeURIComponent(layerId)}/features?limit=${limit}`,
     );
   }
 
